@@ -13,18 +13,36 @@ def get_guess_entropies():
   return guess_entropies
 
 def get_entropy(word):
-  word_statuses = defaultdict(int)
+  word_status_freqs = get_word_status_freqs(word)
   solutions = get_solutions()
-  for solution in solutions:
-    word_status = get_word_statuses(word, solution)
-    word_statuses[word_status] += 1
   
   entropy = 0
-  for word_status, word_status_freq in word_statuses.items():
+  for word_status, word_status_freq in word_status_freqs.items():
     prob_status = word_status_freq / len(solutions)
     bits_of_info = log2(1 / prob_status)
     entropy += prob_status * bits_of_info
   return entropy
+
+def get_word_status_freqs(word):
+  word_status_freqs = defaultdict(int)
+  solutions = get_solutions()
+  for solution in solutions:
+    word_status = get_word_statuses(word, solution)
+    word_status_freqs[word_status] += 1
+  return word_status_freqs
+
+def get_word_status_list(word):
+  word_status_list = defaultdict(list[str])
+  solutions = get_solutions()
+  for solution in solutions:
+    word_status = get_word_statuses(word, solution)
+    word_status_list[word_status].append(solution)
+  return word_status_list
+
+def print_word_statuses(word_statuses):
+  sorted_word_status_items = sorted(word_statuses.items(), key=lambda kv: kv[1], reverse=True)
+  for word_status, word_status_val in sorted_word_status_items:
+    print(''.join([str(status) for status in word_status]), ' ', word_status_val)
 
 """
 class CellStatus(Enum):
@@ -48,5 +66,14 @@ def get_word_statuses(word, solution):
   return tuple(word_statuses)
 """
 
-guess_entropies = get_guess_entropies()
-print(guess_entropies[0])
+# guess_entropies = get_guess_entropies()
+# print_word_statuses(get_word_status_freqs('50126'))
+print(get_entropy('50126'))
+print(get_entropy('50123'))
+print(get_entropy('44556'))
+print(get_entropy('50000'))
+print(get_entropy('52346'))
+print(get_entropy('45678'))
+print(get_entropy('55555'))
+print(get_entropy('00000'))
+print(get_entropy('99999'))

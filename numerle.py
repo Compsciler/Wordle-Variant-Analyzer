@@ -22,24 +22,50 @@ class CellStatus(Enum):
   GREEN = 0
   YELLOW = 1
   GRAY = 2
+  
+  status_emojis = {GREEN: '🟩', YELLOW: '🟨', GRAY: '⬜'}
+  def __str__(self):
+    if self.name == 'GREEN':
+      return '🟩'
+    elif self.name == 'YELLOW':
+      return '🟨'
+    elif self.name == 'GRAY':
+      return '⬜'
+    # return self.status_emojis[self.name]
+  def __repr__(self):
+    return self.name
 
 class HigherLowerStatus(Enum):
   EQUAL = 0
   HIGHER = 1
   LOWER = 2
+  
+  status_emojis = {EQUAL: '🎯', HIGHER: '⬇️', LOWER: '⬆️'}
+  def __str__(self):
+    if self.name == 'EQUAL':
+      return '🎯'
+    elif self.name == 'HIGHER':
+      return '⬇️'
+    elif self.name == 'LOWER':
+      return '⬆️'
+    # return self.status_emojis[self.name]
+  def __repr__(self):
+    return self.name
 
 def get_word_statuses(word, solution):
   word_statuses = [CellStatus.GRAY] * len(word)
   word_letter_freq = Counter(word)
+  solution_letter_freq = Counter(solution)
   for i, c_word in enumerate(word):
     c_sol = solution[i]
     if c_word == c_sol:
       word_statuses[i] = CellStatus.GREEN
       word_letter_freq[c_word] -= 1
   for i, c_word in enumerate(word):
-    if word_letter_freq[c_word] > 0:
+    if word_letter_freq[c_word] > 0 and solution_letter_freq[c_word] > 0:
       word_statuses[i] = CellStatus.YELLOW
       word_letter_freq[c_word] -= 1
+      solution_letter_freq[c_word] -= 1
   
   word_num, sol_num = int(word), int(solution)
   higher_lower_status = HigherLowerStatus.EQUAL
