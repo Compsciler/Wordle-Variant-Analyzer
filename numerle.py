@@ -9,11 +9,10 @@ NUMBER_COUNT = BASE_SYSTEM**DIGIT_COUNT
 # TODO: Add option to set probability of word being solution
 
 def get_solutions():
-  return get_valid_guesses()
+  return [f"{base_repr(n, BASE_SYSTEM).zfill(DIGIT_COUNT)}" for n in range(NUMBER_COUNT)]
 
 def get_valid_guesses():
-  return [f"{base_repr(n, BASE_SYSTEM).zfill(DIGIT_COUNT)}" for n in range(NUMBER_COUNT)]
-  # return [f"{n:0{DIGIT_COUNT}d}" for n in range(NUMBER_COUNT)]
+  return get_solutions()
 
 def get_valid_guesses_hard_mode():
   pass
@@ -34,23 +33,27 @@ class CellStatus(Enum):
     # return self.status_emojis[self.name]
   def __repr__(self):
     return self.name
+  def __lt__(self, other):
+    return self.value < other.value
 
 class HigherLowerStatus(Enum):
   EQUAL = 0
-  HIGHER = 1
-  LOWER = 2
+  TOO_LOW = 1
+  TOO_HIGH = 2
   
-  status_emojis = {EQUAL: '🎯', HIGHER: '⬇️', LOWER: '⬆️'}
+  status_emojis = {EQUAL: '🎯', TOO_HIGH: '⬇️', TOO_LOW: '⬆️'}
   def __str__(self):
     if self.name == 'EQUAL':
       return '🎯'
-    elif self.name == 'HIGHER':
-      return '⬇️'
-    elif self.name == 'LOWER':
+    elif self.name == 'TOO_LOW':
       return '⬆️'
+    elif self.name == 'TOO_HIGH':
+      return '⬇️'
     # return self.status_emojis[self.name]
   def __repr__(self):
     return self.name
+  def __lt__(self, other):
+    return self.value < other.value
 
 def get_word_statuses(word, solution):
   word_statuses = [CellStatus.GRAY] * len(word)
@@ -69,9 +72,9 @@ def get_word_statuses(word, solution):
   
   word_num, sol_num = int(word), int(solution)
   higher_lower_status = HigherLowerStatus.EQUAL
-  if word_num < sol_num:
-    higher_lower_status = HigherLowerStatus.HIGHER
-  elif word_num > sol_num:
-    higher_lower_status = HigherLowerStatus.LOWER
+  if word_num > sol_num:
+    higher_lower_status = HigherLowerStatus.TOO_HIGH
+  elif word_num < sol_num:
+    higher_lower_status = HigherLowerStatus.TOO_LOW
   word_statuses.append(higher_lower_status)
   return tuple(word_statuses)
